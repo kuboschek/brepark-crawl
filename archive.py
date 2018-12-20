@@ -19,18 +19,17 @@ try:
 except FileExistsError:
     pass
 
-with os.scandir(OUTPUT_DIR) as it:
-    for obj in it:
-        # Today's folder is still being added to, so we don't tarball it.
-        if obj.is_dir() and obj.name != date_today and obj.name != os.path.basename(ARCHIVE_DIR):
-            cmd = TAR_CMD.format(os.path.join(ARCHIVE_DIR, obj.name), obj.path)
-            print(cmd)
-            ret = subprocess.call(cmd.split(' '))
+w = os.scandir(OUTPUT_DIR)
 
-            if ret != 0:
-                print("Tar returned with errors. Archival interrupted.")
-                exit(1)
-            else:
-                shutil.rmtree(obj.path)
+for obj in w:
+    # Today's folder is still being added to, so we don't tarball it.
+    if obj.is_dir() and obj.name != date_today and obj.name != os.path.basename(ARCHIVE_DIR):
+        cmd = TAR_CMD.format(os.path.join(ARCHIVE_DIR, obj.name), obj.path)
+        print(cmd)
+        ret = subprocess.call(cmd.split(' '))
 
-        
+        if ret != 0:
+            print("Tar returned with errors. Archival interrupted.")
+            exit(1)
+        else:
+            shutil.rmtree(obj.path)
