@@ -9,6 +9,7 @@
 import os
 import requests
 import datetime
+import json
 
 BREPARK_URL = "https://www.brepark.de/fileadmin/freespaces.json"
 TS_FORMAT = "%a %b %d %H:%M:%S %Y"
