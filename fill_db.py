@@ -14,6 +14,7 @@ import datetime
 import records
 import tarfile
 import json
+import codecs
 
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgres://crawldb:crawldb@localhost:5432/crawl')
 LATEST_UPDATE_Q = 'SELECT * FROM latest_update ORDER BY time DESC LIMIT 1;'
@@ -28,7 +29,9 @@ ISO_DATE = "%Y-%m-%d"
 def read_crawl_result(fp):
     """ Return a list of (timestamp, free_spots, key) tuples with records from the JSON file """
     IGNORE = ('serverTime', 'lastUpdate')
-    res = json.load(fp)
+
+    r = codecs.getreader('utf-8')
+    res = json.load(r(fp))
 
     ts = res['lastUpdate']
 
