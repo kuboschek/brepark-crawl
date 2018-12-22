@@ -107,7 +107,7 @@ def main():
     
     db.query(INSERT_UPDATE_Q)
 
-    print("{} of {} processed.".format(total_count - fail_count, total_count))
+    # print("{} of {} processed.".format(total_count - fail_count, total_count))
 
 
 
