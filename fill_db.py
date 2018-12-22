@@ -25,6 +25,7 @@ OUTPUT_DIR = os.getenv('OUTPUT_DIR', './data')
 ARCHIVE_DIR = os.getenv('ARCHIVE_DIR', os.path.join(OUTPUT_DIR, 'archive'))
 
 ISO_DATE = "%Y-%m-%d"
+ISO_FORMAT = "%Y-%m-%dT%H-%M-%S"
 
 def read_crawl_result(fp):
     """ Return a list of (timestamp, free_spots, key) tuples with records from the JSON file """
@@ -47,6 +48,7 @@ def read_crawl_result(fp):
 
 
 def main():
+    output_dir = os.path.abspath(OUTPUT_DIR)
     archive_dir = os.path.abspath(ARCHIVE_DIR)
 
     db = records.Database(DATABASE_URL)
@@ -57,9 +59,28 @@ def main():
     except IndexError:
         last_update = datetime.datetime(1,1,1)
 
-    archive_files = os.scandir(archive_dir)
-
     to_create = []
+
+    # Go through subfolder of data folder with today's date
+
+    data_folders = os.scandir(output_dir)
+
+    # Go through all subfolders
+    for obj in data_folders:
+        if obj.is_dir() and obj.name != 'archive':
+            crawl_files = os.scandir(obj.path)
+
+            # Go through all crawl results
+            for crawl_doc in crawl_files:
+                if crawl_doc.is_file():
+                    obj_time = datetime.datetime.strptime(crawl_doc.name.replace('.json', ''), ISO_FORMAT)
+
+                    # If crawl time > last_update time, insert into database
+                    if obj_time > last_update.replace(tzinfo=None):
+                        with open(crawl_doc.path, 'rb') as f:
+                            to_create.extend(read_crawl_result(f))
+
+    archive_files = os.scandir(archive_dir)
 
     for obj in archive_files:
         if obj.is_file():
