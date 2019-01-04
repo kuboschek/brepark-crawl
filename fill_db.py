@@ -77,8 +77,11 @@ def main():
 
                     # If crawl time > last_update time, insert into database
                     if obj_time > last_update.replace(tzinfo=None):
-                        with open(crawl_doc.path, 'rb') as f:
-                            to_create.extend(read_crawl_result(f))
+                        try:
+                            with open(crawl_doc.path, 'rb') as f:
+                                to_create.extend(read_crawl_result(f))
+                        except Exception as ex:
+                            print("Failed to process {}, skipping: {}".format(crawl_doc.path, ex))
 
     archive_files = os.scandir(archive_dir)
 
